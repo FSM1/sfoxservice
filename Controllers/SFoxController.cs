@@ -15,7 +15,7 @@ namespace sfoxservice.Controllers
         public SFoxController(ISFoxApiClient api) => _api = api;
 
         [HttpGet("balances")]
-        public async Task<ActionResult<IEnumerable<BalanceResponse>>> GetBalances() 
+        public async Task<ActionResult<IEnumerable<BalanceResponse>>> GetBalances()
         {
             var balances = await _api.GetBalances();
             return balances.ToList();
@@ -26,6 +26,13 @@ namespace sfoxservice.Controllers
         {
             var assetPairs = await _api.GetAssetPairs();
             return assetPairs.Values.ToList();
+        }
+
+        [HttpDelete("order/{id}")]
+        public async Task<ActionResult> DeleteOrder(int id)
+        {
+            await _api.CancelOrder(id);
+            return null;
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -6,7 +7,7 @@ using Newtonsoft.Json;
 namespace sfoxservice.Services
 {
 
-    public class SFoxApiClient: ISFoxApiClient
+    public class SFoxApiClient : ISFoxApiClient
     {
         private readonly HttpClient _httpClient;
 
@@ -15,29 +16,42 @@ namespace sfoxservice.Services
             _httpClient = client;
         }
 
-        public Task CancelOrder(int orderId)
+        public async Task CancelOrder(int orderId)
         {
-            throw new System.NotImplementedException();
+            var uri = $"orders/{orderId}";
+            await _httpClient.DeleteAsync(uri);
         }
 
-        public Task<OrderStatusResponse> CreateBuyLimitOrder(float quanitity, string currencyPair, decimal price)
+        public async Task<OrderStatusResponse> CreateBuyLimitOrder(decimal quanitity, string currencyPair, decimal price)
         {
-            throw new System.NotImplementedException();
+            var uri = $"orders/buy?quantity={quanitity}&currency_pair={currencyPair}&price={price}";
+            var response = await _httpClient.PostAsync(uri, null);
+            var order = JsonConvert.DeserializeObject<OrderStatusResponse>(response.Content.ToString());
+            return order;
         }
 
-        public Task<OrderStatusResponse> CreateBuyMarketOrder(float quanitity, string currencyPair)
+        public async Task<OrderStatusResponse> CreateBuyMarketOrder(decimal quanitity, string currencyPair)
         {
-            throw new System.NotImplementedException();
+            var uri = $"orders/buy?quantity={quanitity}&currency_pair={currencyPair}";
+            var response = await _httpClient.PostAsync(uri, null);
+            var order = JsonConvert.DeserializeObject<OrderStatusResponse>(response.Content.ToString());
+            return order;
         }
 
-        public Task<OrderStatusResponse> CreateSellLimitOrder(float quanitity, string currencyPair, decimal price)
+        public async Task<OrderStatusResponse> CreateSellLimitOrder(decimal quanitity, string currencyPair, decimal price)
         {
-            throw new System.NotImplementedException();
+            var uri = $"orders/sell?quantity={quanitity}&currency_pair={currencyPair}&price={price}";
+            var response = await _httpClient.PostAsync(uri, null);
+            var order = JsonConvert.DeserializeObject<OrderStatusResponse>(response.Content.ToString());
+            return order;
         }
 
-        public Task<OrderStatusResponse> CreateSellMarketOrder(float quanitity, string currencyPair)
+        public async Task<OrderStatusResponse> CreateSellMarketOrder(decimal quanitity, string currencyPair)
         {
-            throw new System.NotImplementedException();
+            var uri = $"orders/sell?quantity={quanitity}&currency_pair={currencyPair}";
+            var response = await _httpClient.PostAsync(uri, null);
+            var order = JsonConvert.DeserializeObject<OrderStatusResponse>(response.Content.ToString());
+            return order;
         }
 
         public async Task<IDictionary<string, AssetPairResponse>> GetAssetPairs()
@@ -66,19 +80,20 @@ namespace sfoxservice.Services
             throw new System.NotImplementedException();
         }
 
-        public Task<OrderStatusResponse> GetOrderStatus(int orderId)
+        public async Task<OrderStatusResponse> GetOrderStatus(int orderId)
         {
-            throw new System.NotImplementedException();
+            var uri = $"orders/{orderId}";
+            var response = await _httpClient.GetStringAsync(uri);
+            var order = JsonConvert.DeserializeObject<OrderStatusResponse>(response);
+            return order;
         }
 
-        public Task<IEnumerable<TradeHistoryResponse>> GetTradeHistory()
+        public async Task<IEnumerable<TradeHistoryResponse>> GetTradeHistory(DateTime? startDate, DateTime? endDate)
         {
-            throw new System.NotImplementedException();
-        }
-
-        Task ISFoxApiClient.CancelOrder(int orderId)
-        {
-            throw new System.NotImplementedException();
+            var uri = "account/transactions";
+            var response = await _httpClient.GetStringAsync(uri);
+            var assetPairs = JsonConvert.DeserializeObject<IEnumerable<TradeHistoryResponse>>(response);
+            return assetPairs;
         }
     }
 }

@@ -75,10 +75,10 @@ namespace sfoxservice.Services
         Task<IEnumerable<PricingResponse>> GetBestPriceAsync(List<PricingRequest> requests);
         Task<IEnumerable<BalanceResponse>> GetBalances();
         Task<IEnumerable<TradeHistoryResponse>> GetTradeHistory();
-        Task<OrderStatusResponse> CreateBuyMarketOrder(float quanitity, string currencyPair);
-        Task<OrderStatusResponse> CreateBuyLimitOrder(float quanitity, string currencyPair, decimal price);
-        Task<OrderStatusResponse> CreateSellMarketOrder(float quanitity, string currencyPair);
-        Task<OrderStatusResponse> CreateSellLimitOrder(float quanitity, string currencyPair, decimal price);
+        Task<OrderStatusResponse> CreateBuyMarketOrder(decimal quanitity, string currencyPair);
+        Task<OrderStatusResponse> CreateBuyLimitOrder(decimal quanitity, string currencyPair, decimal price);
+        Task<OrderStatusResponse> CreateSellMarketOrder(decimal quanitity, string currencyPair);
+        Task<OrderStatusResponse> CreateSellLimitOrder(decimal quanitity, string currencyPair, decimal price);
         Task<OrderStatusResponse> GetOrderStatus(int orderId);
         Task CancelOrder(int orderId);
         Task<IDictionary<string, AssetPairResponse>> GetAssetPairs();
