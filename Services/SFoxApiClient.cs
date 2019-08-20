@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 
 namespace sfoxservice.Services
 {
-
     public class SFoxApiClient : ISFoxApiClient
     {
         private readonly HttpClient _httpClient;
@@ -70,12 +69,7 @@ namespace sfoxservice.Services
             return balances;
         }
 
-        public Task<PricingResponse> GetBestPriceAsync(string assetName, float amount)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Task<IEnumerable<PricingResponse>> GetBestPriceAsync(List<PricingRequest> requests)
+        public Task<PricingResponse> GetBestPriceAsync(string assetName, decimal amount)
         {
             throw new System.NotImplementedException();
         }
