@@ -27,5 +27,12 @@ namespace sfoxservice.Controllers
             var balances = await _api.GetBalances();
             return balances.ToList();
         }
+
+        [HttpGet("assetPairs")]
+        public async Task<ActionResult<IEnumerable<AssetPairResponse>>> GetAssetPairs()
+        {
+            var assetPairs = await _api.GetAssetPairs();
+            return assetPairs.Values.ToList();
+        }
     }
 }
