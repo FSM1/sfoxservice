@@ -13,13 +13,6 @@ namespace sfoxservice.Controllers
     {
         private ISFoxApiClient _api;
         public SFoxController(ISFoxApiClient api) => _api = api;
-        
-        // GET api/values
-        [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
 
         [HttpGet("balances")]
         public async Task<ActionResult<IEnumerable<BalanceResponse>>> GetBalances() 
