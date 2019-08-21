@@ -77,25 +77,23 @@ namespace sfoxservice.Controllers
             return tradehistory.ToList();
         }
 
-        [HttpGet("bestPrice/{assetName}/{amount}")]
-        public async Task<ActionResult<PricingResponse>> GetBestPrice(string assetName, decimal amount)
+        [HttpGet("bestPrice/{assetPair}/{amount}")]
+        public async Task<ActionResult<PricingResponse>> GetBestPrice(string assetPair, decimal amount)
         {
-            var priceResponse = await _api.GetBestPrice(assetName, amount);
+            var priceResponse = await _api.GetBestPrice(assetPair, amount);
             return priceResponse;
         }
 
         // TODO Replace POST since this clearly goes against REST API standards
         [HttpPost("bestPrices")]
-        public async Task<ActionResult<IEnumerable<PricingResponse>>> GetBestPrices(IEnumerable<PricingRequest> pricingRequests)
+        public async Task<ActionResult<IDictionary<string, PricingResponse>>> GetBestPrices(IEnumerable<PricingRequest> pricingRequests)
         {
-            // TODO Find a way to do these requests in parallel 
-            var results = new List<PricingResponse>();
-            foreach (var req in pricingRequests)
-            {
-                var priceResponse = await _api.GetBestPrice(req.assetName, req.amount);
-                results.Add(priceResponse);
-            }
-            
+            var results = new Dictionary<string, PricingResponse>();
+            await Task.WhenAll(pricingRequests.Select(async req  => {
+                var priceResponse = await _api.GetBestPrice(req.assetPair, req.amount);
+                results.Add(req.assetPair, priceResponse);
+            }));
+
             return results;
         }
     }

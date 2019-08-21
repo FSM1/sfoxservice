@@ -6,7 +6,7 @@ namespace sfoxservice.Services
 {
     public class PricingRequest
     {
-        public string assetName { get; set; }
+        public string assetPair { get; set; }
         public decimal amount { get; set; }
     }
     
