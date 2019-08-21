@@ -82,7 +82,7 @@ namespace sfoxservice.Services
             return order;
         }
 
-        public async Task<IEnumerable<TradeHistoryResponse>> GetTradeHistory(DateTime? startDate, DateTime? endDate)
+        public async Task<IEnumerable<TradeHistoryResponse>> GetTradeHistory()
         {
             var uri = "account/transactions";
             var response = await _httpClient.GetStringAsync(uri);
