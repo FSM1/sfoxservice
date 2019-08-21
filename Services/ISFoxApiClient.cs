@@ -7,7 +7,7 @@ namespace sfoxservice.Services
     public class PricingRequest
     {
         public string assetName { get; set; }
-        public float amount { get; set; }
+        public decimal amount { get; set; }
     }
     
     public class PricingResponse
@@ -71,7 +71,7 @@ namespace sfoxservice.Services
 
     public interface ISFoxApiClient
     {
-        Task<PricingResponse> GetBestPriceAsync(string assetName, decimal amount);
+        Task<PricingResponse> GetBestPrice(string assetName, decimal amount);
         Task<IEnumerable<BalanceResponse>> GetBalances();
         Task<IEnumerable<TradeHistoryResponse>> GetTradeHistory();
         Task<OrderStatusResponse> CreateBuyMarketOrder(decimal quanitity, string currencyPair);

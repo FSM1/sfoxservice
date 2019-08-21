@@ -69,7 +69,7 @@ namespace sfoxservice.Services
             return balances;
         }
 
-        public Task<PricingResponse> GetBestPriceAsync(string assetName, decimal amount)
+        public Task<PricingResponse> GetBestPrice(string assetName, decimal amount)
         {
             throw new System.NotImplementedException();
         }
