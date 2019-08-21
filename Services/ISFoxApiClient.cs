@@ -71,7 +71,7 @@ namespace sfoxservice.Services
 
     public interface ISFoxApiClient
     {
-        Task<PricingResponse> GetBestPrice(string assetName, decimal amount);
+        Task<PricingResponse> GetBestPrice(string assetPair, decimal amount);
         Task<IEnumerable<BalanceResponse>> GetBalances();
         Task<IEnumerable<TradeHistoryResponse>> GetTradeHistory();
         Task<OrderStatusResponse> CreateBuyMarketOrder(decimal quanitity, string currencyPair);

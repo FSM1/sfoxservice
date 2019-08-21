@@ -89,11 +89,11 @@ namespace sfoxservice.Controllers
         public async Task<ActionResult<IEnumerable<PricingResponse>>> GetBestPrices(IEnumerable<PricingRequest> pricingRequests)
         {
             // TODO Find a way to do these requests in parallel 
-            var results = new PricingResponse[0];
+            var results = new List<PricingResponse>();
             foreach (var req in pricingRequests)
             {
                 var priceResponse = await _api.GetBestPrice(req.assetName, req.amount);
-                results.Append(priceResponse);
+                results.Add(priceResponse);
             }
             
             return results;

@@ -69,9 +69,13 @@ namespace sfoxservice.Services
             return balances;
         }
 
-        public Task<PricingResponse> GetBestPrice(string assetName, decimal amount)
+        public async Task<PricingResponse> GetBestPrice(string assetPair, decimal amount)
         {
-            throw new System.NotImplementedException();
+            // TODO: What about sell price
+            var uri = $"offer/buy?amount={amount}&pair={assetPair}";
+            var response = await _httpClient.GetStringAsync(uri);
+            var pricingResponse = JsonConvert.DeserializeObject<PricingResponse>(response);
+            return pricingResponse;
         }
 
         public async Task<OrderStatusResponse> GetOrderStatus(int orderId)
