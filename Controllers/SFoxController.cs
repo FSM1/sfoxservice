@@ -86,12 +86,12 @@ namespace sfoxservice.Controllers
 
         // TODO Replace POST since this clearly goes against REST API standards
         [HttpPost("bestPrices")]
-        public async Task<ActionResult<IDictionary<string, PricingResponse>>> GetBestPrices(IEnumerable<PricingRequest> pricingRequests)
+        public async Task<ActionResult<IDictionary<string, PricingResponse>>> GetBestPrices(IDictionary<string, decimal> pricingRequests)
         {
             var results = new Dictionary<string, PricingResponse>();
             await Task.WhenAll(pricingRequests.Select(async req  => {
-                var priceResponse = await _api.GetBestPrice(req.assetPair, req.amount);
-                results.Add(req.assetPair, priceResponse);
+                var priceResponse = await _api.GetBestPrice(req.Key, req.Value);
+                results.Add(req.Key, priceResponse);
             }));
 
             return results;
