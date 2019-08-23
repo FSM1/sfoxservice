@@ -31,8 +31,8 @@ namespace sfoxservice.Services
     public class TradeHistoryResponse
     {
         public int id { get; set; }
-        public int order_id { get; set; }
-        public int client_order_id { get; set; }
+        public string order_id { get; set; }
+        public string client_order_id { get; set; }
         public DateTime day { get; set; }
         public string action { get; set; }
         public string currency { get; set; }
