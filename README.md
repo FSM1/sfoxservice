@@ -12,5 +12,5 @@ The development environment uses [Secret Manager](https://docs.microsoft.com/en-
 ## Docker
 
 1. Run `docker build -t sfox .` to build your container
-2. Run `docker run -e SFoxApi__ApiKey=YOUR_API_KEY -p 80:80 sfox` to start the container. Replace with your API key.
+2. Run `docker run -e SFoxApi__ApiKey=YOUR_API_KEY -p 80:80 sfox` to start the container.
 3. Navigate to `http://localhost/swagger` to view documentation.
