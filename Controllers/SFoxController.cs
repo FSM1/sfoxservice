@@ -42,31 +42,17 @@ namespace sfoxservice.Controllers
             return null;
         }
 
-        [HttpPost("order/market/buy")]
-        public async Task<ActionResult<OrderStatusResponse>> CreateBuyMarketOrder(decimal quanitity, string currencyPair)
+        [HttpPost("order/market")]
+        public async Task<ActionResult<OrderStatusResponse>> CreateMarketOrder(OrderAction action, decimal quantity, string currencyPair)
         {
-            var order = await _api.CreateBuyMarketOrder(quanitity, currencyPair);
+            var order = await _api.CreateMarketOrder(action, quantity, currencyPair);
             return order;
         }
 
-        [HttpPost("order/market/sell")]
-        public async Task<ActionResult<OrderStatusResponse>> CreateSellMarketOrder(decimal quanitity, string currencyPair)
+        [HttpPost("order/limit")]
+        public async Task<ActionResult<OrderStatusResponse>> CreateLimitOrder(OrderAction action, decimal quanitity, string currencyPair, decimal price)
         {
-            var order = await _api.CreateSellMarketOrder(quanitity, currencyPair);
-            return order;
-        }
-
-        [HttpPost("order/limit/buy")]
-        public async Task<ActionResult<OrderStatusResponse>> CreateBuyLimitOrder(decimal quanitity, string currencyPair, decimal price)
-        {
-            var order = await _api.CreateBuyLimitOrder(quanitity, currencyPair, price);
-            return order;
-        }
-
-        [HttpPost("order/limit/sell")]
-        public async Task<ActionResult<OrderStatusResponse>> CreateSellLimitOrder(decimal quanitity, string currencyPair, decimal price)
-        {
-            var order = await _api.CreateSellLimitOrder(quanitity, currencyPair, price);
+            var order = await _api.CreateLimitOrder(action, quanitity, currencyPair, price);
             return order;
         }
 
@@ -80,21 +66,22 @@ namespace sfoxservice.Controllers
         [HttpGet("bestPrice/{assetPair}/{amount}")]
         public async Task<ActionResult<PricingResponse>> GetBestPrice(string assetPair, decimal amount)
         {
-            var priceResponse = await _api.GetBestPrice(assetPair, amount);
+            var priceResponse = await _api.GetBestPrice(OrderAction.buy, assetPair, amount);
             return priceResponse;
         }
 
-        // TODO Replace POST since this clearly goes against REST API standards
+        // TODO Replace POST since this clearly goes against REST standards
         [HttpPost("bestPrices")]
         public async Task<ActionResult<IDictionary<string, PricingResponse>>> GetBestPrices(IDictionary<string, decimal> pricingRequests)
         {
-            var results = new Dictionary<string, PricingResponse>();
-            await Task.WhenAll(pricingRequests.Select(async req  => {
-                var priceResponse = await _api.GetBestPrice(req.Key, req.Value);
-                results.Add(req.Key, priceResponse);
+            // var results = new Dictionary<string, PricingResponse>();
+            var results = await Task.WhenAll(pricingRequests.Select(async req =>
+            {
+                var priceResponse = await _api.GetBestPrice(OrderAction.buy, req.Key, req.Value);
+                return new KeyValuePair<string, PricingResponse>(req.Key, priceResponse);
             }));
 
-            return results;
+            return results.ToDictionary(r => r.Key, r => r.Value);
         }
     }
 }

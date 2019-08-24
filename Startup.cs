@@ -5,16 +5,17 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Converters;
 using sfoxservice.Services;
 
 namespace sfoxservice
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration) 
+        public Startup(IConfiguration configuration)
         {
             this.Configuration = configuration;
-               
+
         }
         public IConfiguration Configuration { get; }
 
@@ -22,9 +23,13 @@ namespace sfoxservice
         public void ConfigureServices(IServiceCollection services)
         {
             var SFoxApiConfig = Configuration.GetSection("SFoxApi").Get<ApiSettings>();
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc()
+                .AddJsonOptions(options =>
+                    options.SerializerSettings.Converters.Add(new StringEnumConverter()))
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddSwaggerDocument();
-            services.AddHttpClient<ISFoxApiClient, SFoxApiClient>(c => {
+            services.AddHttpClient<ISFoxApiClient, SFoxApiClient>(c =>
+            {
                 c.BaseAddress = new Uri(SFoxApiConfig.BaseAddress);
                 c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", SFoxApiConfig.ApiKey);
             });

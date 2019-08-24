@@ -69,17 +69,20 @@ namespace sfoxservice.Services
         public string symbol { get; set; }
     }
 
+    public enum OrderAction {
+        buy,
+        sell,
+    }
+
     public interface ISFoxApiClient
     {
-        Task<PricingResponse> GetBestPrice(string assetPair, decimal amount);
+        Task<PricingResponse> GetBestPrice(OrderAction action, string assetPair, decimal amount);
         Task<IEnumerable<BalanceResponse>> GetBalances();
         Task<IEnumerable<TradeHistoryResponse>> GetTradeHistory();
-        Task<OrderStatusResponse> CreateBuyMarketOrder(decimal quanitity, string currencyPair);
-        Task<OrderStatusResponse> CreateBuyLimitOrder(decimal quanitity, string currencyPair, decimal price);
-        Task<OrderStatusResponse> CreateSellMarketOrder(decimal quanitity, string currencyPair);
-        Task<OrderStatusResponse> CreateSellLimitOrder(decimal quanitity, string currencyPair, decimal price);
         Task<OrderStatusResponse> GetOrderStatus(int orderId);
         Task CancelOrder(int orderId);
         Task<IDictionary<string, AssetPairResponse>> GetAssetPairs();
+        Task<OrderStatusResponse> CreateMarketOrder(OrderAction action, decimal quantity, string currencyPair);
+        Task<OrderStatusResponse> CreateLimitOrder(OrderAction action, decimal quantity, string currencyPair, decimal price);
     }
 }
