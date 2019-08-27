@@ -17,86 +17,94 @@ namespace sfoxservice.Services
             _httpClient = client;
         }
 
-        public async Task CancelOrder(int orderId)
+        public Task CancelOrder(int orderId)
         {
-            var uri = $"orders/{orderId}";
-            await _httpClient.DeleteAsync(uri);
+            return InvokeAsync<object>(
+                client => client.GetAsync($"orders/{orderId}"));
         }
 
-        public async Task<OrderStatusResponse> CreateMarketOrder(OrderAction action, decimal quantity, string currencyPair)
+        public Task<OrderStatusResponse> CreateMarketOrder(OrderAction action, decimal quantity, string currencyPair)
         {
-            var uri = $"orders/{action.ToString()}";
             var req = new
             {
                 quantity = quantity,
-                currency_pair = currencyPair
+                currency_pair = currencyPair,
             };
-            var reqBody = new StringContent(JsonConvert.SerializeObject(req), Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync(uri, reqBody);
-            if (response.IsSuccessStatusCode)
-            {
-                return JsonConvert.DeserializeObject<OrderStatusResponse>(await response.Content.ReadAsStringAsync());
-            } 
-            throw new Exception();
+
+            return InvokeAsync(
+                client => client.PostAsJsonAsync($"orders/{action.ToString()}", req),
+                response => response.Content.ReadAsAsync<OrderStatusResponse>());
         }
-        public async Task<OrderStatusResponse> CreateLimitOrder(OrderAction action, decimal quantity, string currencyPair, decimal price)
+        public Task<OrderStatusResponse> CreateLimitOrder(OrderAction action, decimal quantity, string currencyPair, decimal price)
         {
-            var uri = $"orders/{action.ToString()}";
             var req = new
             {
                 quantity = quantity,
                 currency_pair = currencyPair,
                 price = price
             };
-            var reqBody = new StringContent(JsonConvert.SerializeObject(req), Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync(uri, reqBody);
-            var order = JsonConvert.DeserializeObject<OrderStatusResponse>(await response.Content.ReadAsStringAsync());
-            if (response.IsSuccessStatusCode)
+            return InvokeAsync(
+                client => client.PostAsJsonAsync($"orders/{action.ToString()}", req),
+                response => response.Content.ReadAsAsync<OrderStatusResponse>());
+        }
+
+        public Task<IDictionary<string, AssetPairResponse>> GetAssetPairs()
+        {
+            return InvokeAsync(
+                client => client.GetAsync("markets/currency-pairs"),
+                response => response.Content.ReadAsAsync<IDictionary<string, AssetPairResponse>>());
+        }
+
+        public Task<IEnumerable<BalanceResponse>> GetBalances()
+        {
+            return InvokeAsync(
+                client => client.GetAsync("user/balance"),
+                response => response.Content.ReadAsAsync<IEnumerable<BalanceResponse>>());
+        }
+
+        public Task<PricingResponse> GetBestPrice(OrderAction action, string assetPair, decimal amount)
+        {
+            return InvokeAsync(
+                client => client.GetAsync($"offer/{action}?amount={amount}&pair={assetPair}"),
+                response => response.Content.ReadAsAsync<PricingResponse>());
+        }
+
+        public Task<OrderStatusResponse> GetOrderStatus(int orderId)
+        {
+            return InvokeAsync(
+                client => client.GetAsync($"orders/{orderId}"),
+                response => response.Content.ReadAsAsync<OrderStatusResponse>());
+        }
+
+        public Task<IEnumerable<TradeHistoryResponse>> GetTradeHistory()
+        {
+            return InvokeAsync(
+                client => client.GetAsync("account/transactions"),
+                response => response.Content.ReadAsAsync<IEnumerable<TradeHistoryResponse>>());
+        }
+
+        private async Task<T> InvokeAsync<T>(Func<HttpClient, Task<HttpResponseMessage>> operation,
+            Func<HttpResponseMessage, Task<T>> actionOnResponse = null)
+        {
+            if (operation == null)
+                throw new ArgumentNullException(nameof(operation));
+
+            HttpResponseMessage response = await operation(_httpClient).ConfigureAwait(false);
+
+            if (!response.IsSuccessStatusCode)
             {
-                return JsonConvert.DeserializeObject<OrderStatusResponse>(await response.Content.ReadAsStringAsync());
-            } 
-            throw new HttpRequestException();
-        }
-
-        public async Task<IDictionary<string, AssetPairResponse>> GetAssetPairs()
-        {
-            var uri = "markets/currency-pairs";
-            var response = await _httpClient.GetStringAsync(uri);
-            var assetPairs = JsonConvert.DeserializeObject<IDictionary<string, AssetPairResponse>>(response);
-            return assetPairs;
-        }
-
-        public async Task<IEnumerable<BalanceResponse>> GetBalances()
-        {
-            var uri = "user/balance";
-            var response = await _httpClient.GetStringAsync(uri);
-            var balances = JsonConvert.DeserializeObject<IEnumerable<BalanceResponse>>(response);
-            return balances;
-        }
-
-        public async Task<PricingResponse> GetBestPrice(OrderAction action, string assetPair, decimal amount)
-        {
-            // TODO: What about sell price
-            var uri = $"offer/{action}?amount={amount}&pair={assetPair}";
-            var response = await _httpClient.GetStringAsync(uri);
-            var pricingResponse = JsonConvert.DeserializeObject<PricingResponse>(response);
-            return pricingResponse;
-        }
-
-        public async Task<OrderStatusResponse> GetOrderStatus(int orderId)
-        {
-            var uri = $"orders/{orderId}";
-            var response = await _httpClient.GetStringAsync(uri);
-            var order = JsonConvert.DeserializeObject<OrderStatusResponse>(response);
-            return order;
-        }
-
-        public async Task<IEnumerable<TradeHistoryResponse>> GetTradeHistory()
-        {
-            var uri = "account/transactions";
-            var response = await _httpClient.GetStringAsync(uri);
-            var assetPairs = JsonConvert.DeserializeObject<IEnumerable<TradeHistoryResponse>>(response);
-            return assetPairs;
+                var exception = new Exception($"Resource server returned an error. StatusCode : {response.StatusCode}");
+                exception.Data.Add("StatusCode", response.StatusCode);
+                throw exception;
+            }
+            if (actionOnResponse != null)
+            {
+                return await actionOnResponse(response).ConfigureAwait(false);
+            }
+            else
+            {
+                return default(T);
+            }
         }
     }
 }
