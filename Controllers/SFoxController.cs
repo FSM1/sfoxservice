@@ -63,7 +63,7 @@ namespace sfoxservice.Controllers
             return tradehistory.ToList();
         }
 
-        [HttpGet("bestPrice")]
+        [HttpGet("bestPrices")]
         public async Task<ActionResult<IDictionary<string, PricingResponse>>> GetBestPrices([FromQuery] IDictionary<string, decimal> pricingRequests)
         {
             var results = await Task.WhenAll(pricingRequests.Select(async req =>
