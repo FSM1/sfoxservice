@@ -27,7 +27,7 @@ namespace sfoxservice
                 .AddJsonOptions(options =>
                     options.SerializerSettings.Converters.Add(new StringEnumConverter()))
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddSwaggerDocument();
+            services.AddOpenApiDocument();
             services.AddHttpClient<ISFoxApiClient, SFoxApiClient>(c =>
             {
                 c.BaseAddress = new Uri(SFoxApiConfig.BaseAddress);
