@@ -20,7 +20,7 @@ namespace sfoxservice.Services
         public Task CancelOrder(int orderId)
         {
             return InvokeAsync<object>(
-                client => client.GetAsync($"orders/{orderId}"));
+                client => client.DeleteAsync($"orders/{orderId}"));
         }
 
         public Task<OrderStatusResponse> CreateMarketOrder(OrderAction action, decimal quantity, string currencyPair)
@@ -30,11 +30,11 @@ namespace sfoxservice.Services
                 quantity = quantity,
                 currency_pair = currencyPair,
             };
-
             return InvokeAsync(
                 client => client.PostAsJsonAsync($"orders/{action.ToString()}", req),
                 response => response.Content.ReadAsAsync<OrderStatusResponse>());
         }
+
         public Task<OrderStatusResponse> CreateLimitOrder(OrderAction action, decimal quantity, string currencyPair, decimal price)
         {
             var req = new
@@ -93,7 +93,7 @@ namespace sfoxservice.Services
 
             if (!response.IsSuccessStatusCode)
             {
-                var exception = new Exception($"Resource server returned an error. StatusCode : {response.StatusCode}");
+                var exception = new Exception($"SFOX API returned an error. StatusCode : {response.StatusCode}");
                 exception.Data.Add("StatusCode", response.StatusCode);
                 throw exception;
             }

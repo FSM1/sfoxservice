@@ -63,18 +63,9 @@ namespace sfoxservice.Controllers
             return tradehistory.ToList();
         }
 
-        [HttpGet("bestPrice/{assetPair}/{amount}")]
-        public async Task<ActionResult<PricingResponse>> GetBestPrice(string assetPair, decimal amount)
+        [HttpGet("bestPrice")]
+        public async Task<ActionResult<IDictionary<string, PricingResponse>>> GetBestPrices([FromQuery] IDictionary<string, decimal> pricingRequests)
         {
-            var priceResponse = await _api.GetBestPrice(OrderAction.buy, assetPair, amount);
-            return priceResponse;
-        }
-
-        // TODO Replace POST since this clearly goes against REST standards
-        [HttpPost("bestPrices")]
-        public async Task<ActionResult<IDictionary<string, PricingResponse>>> GetBestPrices(IDictionary<string, decimal> pricingRequests)
-        {
-            // var results = new Dictionary<string, PricingResponse>();
             var results = await Task.WhenAll(pricingRequests.Select(async req =>
             {
                 var priceResponse = await _api.GetBestPrice(OrderAction.buy, req.Key, req.Value);
